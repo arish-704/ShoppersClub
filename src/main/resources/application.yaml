@@ -1,3 +1,53 @@
 spring:
   application:
     name: shoppersclub
+
+  datasource:
+    url: jdbc:h2:file:./data/shoppersclub_db;MODE=MySQL;DATABASE_TO_LOWER=TRUE;AUTO_SERVER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+
+# ------------------------------------------------------------------
+# Spring Boot DevTools
+#
+# DevTools is used only during development.
+#
+# restart:
+#   - When enabled, Spring Boot automatically restarts the application
+#     whenever Java classes or resources are modified and saved.
+#   - This saves time because we don't have to stop and run the
+#     application manually after every code change.
+#
+# livereload:
+#   - Used mainly for frontend development (HTML, CSS, JavaScript).
+#   - Automatically refreshes the browser whenever frontend files change.
+#   - Since ShoppersClub currently has only a backend, this feature
+#     is disabled as it is not required.
+#
+# Both of these properties are ignored in the production environment.
+# ------------------------------------------------------------------
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 6969
