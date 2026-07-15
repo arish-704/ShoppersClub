@@ -2,6 +2,7 @@ package com.arish.shoppersclub.entity;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
@@ -46,8 +47,12 @@ public class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Don't generate the ID yourself. Let the database handle it.
     private Long id; // --> Use wrapper classes (Long, Integer, Boolean) for entity fields because they can represent null, which has meaning in persistence.
-
+    
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+    
+    
+    @Column(nullable =false)
     private LocalDateTime updatedAt;
 
 
