@@ -1,4 +1,4 @@
-package com.arish.shoppersclub.dto;
+package com.arish.shoppersclub.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

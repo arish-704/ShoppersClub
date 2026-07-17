@@ -1,4 +1,4 @@
-package com.arish.shoppersclub.dto;
+package com.arish.shoppersclub.dto.response;
 
 import java.util.Set;
 

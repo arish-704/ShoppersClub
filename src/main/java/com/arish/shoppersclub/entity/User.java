@@ -36,6 +36,8 @@ import lombok.Setter;
  * This entity stores user profile information, authentication
  * credentials, and assigned roles.
  *
+ * 
+ * The UserDetailsService is a core interface in Spring Security used to load user-specific data (such as username, password, and roles) from a data source during the authentication process.
  * It implements Spring Security's {@link UserDetails} interface,
  * allowing Spring Security to directly use this entity during
  * authentication and authorization without requiring a separate

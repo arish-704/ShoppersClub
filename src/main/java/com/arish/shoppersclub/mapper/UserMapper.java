@@ -2,8 +2,8 @@ package com.arish.shoppersclub.mapper;
 
 import org.springframework.stereotype.Component;
 
-import com.arish.shoppersclub.dto.RegisterRequest;
-import com.arish.shoppersclub.dto.RegisterResponse;
+import com.arish.shoppersclub.dto.request.RegisterRequest;
+import com.arish.shoppersclub.dto.response.RegisterResponse;
 import com.arish.shoppersclub.entity.User;
 
 @Component

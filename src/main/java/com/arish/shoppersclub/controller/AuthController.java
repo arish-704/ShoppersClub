@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.arish.shoppersclub.dto.RegisterRequest;
-import com.arish.shoppersclub.dto.RegisterResponse;
+import com.arish.shoppersclub.dto.request.RegisterRequest;
+import com.arish.shoppersclub.dto.response.RegisterResponse;
 import com.arish.shoppersclub.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
