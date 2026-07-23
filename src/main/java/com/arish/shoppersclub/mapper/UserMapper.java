@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.arish.shoppersclub.dto.request.RegisterRequest;
 import com.arish.shoppersclub.dto.response.RegisterResponse;
+import com.arish.shoppersclub.dto.response.UserProfileResponse;
 import com.arish.shoppersclub.entity.User;
 
 @Component
@@ -27,4 +28,16 @@ public class UserMapper {
             user.getRoles()
         );
     }
+
+    public UserProfileResponse toProfileResponse(User user){
+        return new UserProfileResponse(
+            user.getId(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getEmail(),
+            user.getRoles(),
+            user.getCreatedAt()
+        );
+    }
+
 }

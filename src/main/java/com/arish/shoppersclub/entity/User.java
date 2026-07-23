@@ -17,6 +17,7 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
@@ -70,7 +71,7 @@ public class User extends BaseEntity implements UserDetails {
 
     // @Column(nullable = false) --> here we are not using the column annotation as it will not be stored in the same table as a column it will be made into a new table to store the value.
     //This isn't a relationship to another entity, it's a collection of basic values (enums, strings, embeddables, etc.) that needs its own table.    
-    @ElementCollection 
+    @ElementCollection(fetch = FetchType.EAGER) 
     @CollectionTable(
         name = "user_roles",
         joinColumns = @JoinColumn(name = "user_id")
