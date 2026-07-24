@@ -1,12 +1,15 @@
 package com.arish.shoppersclub.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.arish.shoppersclub.dto.request.ChangePasswordRequest;
 import com.arish.shoppersclub.dto.request.UpdateProfileRequest;
 import com.arish.shoppersclub.dto.response.UserProfileResponse;
 import com.arish.shoppersclub.service.UserService;
@@ -32,5 +35,17 @@ public class UserController {
         UserProfileResponse response = userService.updateProfile(request);
         return ResponseEntity.ok(response);
 
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<Void> updatePassword(@Valid @RequestBody ChangePasswordRequest request){
+        userService.changePassword(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deactivateAccount(){
+        userService.deactivateCurrentUser();
+        return ResponseEntity.ok().build();
     }
 }
