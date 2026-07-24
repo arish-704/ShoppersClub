@@ -2,12 +2,16 @@ package com.arish.shoppersclub.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.arish.shoppersclub.dto.request.UpdateProfileRequest;
 import com.arish.shoppersclub.dto.response.UserProfileResponse;
 import com.arish.shoppersclub.service.UserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -23,4 +27,10 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/me")
+    public ResponseEntity<UserProfileResponse> updateUserProfile(@Valid @RequestBody UpdateProfileRequest request){
+        UserProfileResponse response = userService.updateProfile(request);
+        return ResponseEntity.ok(response);
+
+    }
 }
