@@ -41,14 +41,14 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public List<AddressResponse> getMyAddress() {
+    public List<AddressResponse> getMyAddresses() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         List<Address> addresses = addressRepository.findByUser(user);
         return addresses.stream()
-                 .map(addressMapper::toResponse)
-                 .toList();
+                        .map(addressMapper::toResponse)
+                        .toList();
         }
 
     @Override
@@ -64,14 +64,26 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressResponse updateAddress(Long id, UpdateAddressRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateAddress'");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        Address address = addressRepository
+                                .findByIdAndUser(id, user)
+                                .orElseThrow(() -> new RuntimeException("Address not found")); // Searches for an address that matches both the provided id AND belongs to the logged-in user
+        addressMapper.updateEntity(address, request);
+        Address savedAddress = addressRepository.save(address);
+        return addressMapper.toResponse(savedAddress);
     }
 
     @Override
     public void deleteAddressById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteAddressById'");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        Address address = addressRepository
+                                .findByIdAndUser(id, user)
+                                .orElseThrow(() -> new RuntimeException("Address not found")); 
+        addressRepository.delete(address);
     }
 
 }

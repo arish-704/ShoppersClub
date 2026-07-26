@@ -3,6 +3,7 @@ package com.arish.shoppersclub.dto.request;
 import com.arish.shoppersclub.enums.AddressType;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record CreateAddressRequest(
     @NotBlank
@@ -28,7 +29,7 @@ public record CreateAddressRequest(
     @NotBlank
     String postalCode,
 
-    @NotBlank
+    @NotNull
     AddressType addressType
 
 ) {

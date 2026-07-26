@@ -8,7 +8,7 @@ import com.arish.shoppersclub.dto.response.AddressResponse;
 
 public interface AddressService {
     AddressResponse createAddress(CreateAddressRequest request);
-    List<AddressResponse> getMyAddress();
+    List<AddressResponse> getMyAddresses();
     AddressResponse getAddressById(Long id);
     AddressResponse updateAddress(Long id, UpdateAddressRequest request);
     void deleteAddressById(Long id);
