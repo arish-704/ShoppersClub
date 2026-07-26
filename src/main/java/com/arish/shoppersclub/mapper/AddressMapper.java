@@ -3,6 +3,7 @@ package com.arish.shoppersclub.mapper;
 import org.springframework.stereotype.Component;
 
 import com.arish.shoppersclub.dto.request.CreateAddressRequest;
+import com.arish.shoppersclub.dto.request.UpdateAddressRequest;
 import com.arish.shoppersclub.dto.response.AddressResponse;
 import com.arish.shoppersclub.entity.Address;
 
@@ -21,6 +22,18 @@ public class AddressMapper {
                       .postalCode(request.postalCode())
                       .addressType(request.addressType())
                       .build();
+    }
+
+    public void updateEntity(Address address, UpdateAddressRequest request) {
+        address.setFullName(request.fullName());
+        address.setPhoneNumber(request.phoneNumber());
+        address.setAddressLine1(request.addressLine1());
+        address.setAddressLine2(request.addressLine2());
+        address.setCity(request.city());
+        address.setState(request.state());
+        address.setCountry(request.country());
+        address.setPostalCode(request.postalCode());
+        address.setAddressType(request.addressType());
     }
 
     public AddressResponse toResponse(Address address){
