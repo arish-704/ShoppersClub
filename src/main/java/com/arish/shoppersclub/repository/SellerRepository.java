@@ -1,0 +1,15 @@
+package com.arish.shoppersclub.repository;
+
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.arish.shoppersclub.entity.Seller;
+import com.arish.shoppersclub.entity.User;
+
+public interface SellerRepository extends JpaRepository<Seller , Long> {
+    boolean existsByUser(User user);
+    boolean existsByStoreName(String storeName);
+    Optional<Seller> findByUser(User user);
+    Optional<Seller> findByStoreName(String storeName);
+}
