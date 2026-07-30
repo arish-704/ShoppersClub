@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(EmailAlreadyExistsException exception , HttpServletRequest request) { // --> HttpServletRequest is used Because it contains information about the HTTP request like the utl from where the issue is coming from.
+    public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(EmailAlreadyExistsException exception , HttpServletRequest request) { // --> HttpServletRequest is used Because it contains information about the HTTP request like the url from where the issue is coming from.
         HttpStatus status = HttpStatus.CONFLICT;
         ErrorResponse errorResponse = new ErrorResponse(
             LocalDateTime.now(),
@@ -26,5 +26,53 @@ public class GlobalExceptionHandler {
                .status(status)
                .body(errorResponse);
 
-}
+    }
+
+    @ExceptionHandler(SellerAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleSellerAlreadyExistsException(SellerAlreadyExistsException exception , HttpServletRequest request){
+        HttpStatus status = HttpStatus.CONFLICT;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+
+    
+    }
+
+    @ExceptionHandler(SellerNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSellerNotFoundException(SellerNotFoundException exception , HttpServletRequest request){
+        HttpStatus status = HttpStatus.CONFLICT;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+
+    }
+
+    @ExceptionHandler(StoreNameAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleStoreNameAlreadyExistsException(StoreNameAlreadyExistsException exception , HttpServletRequest request){
+        HttpStatus status = HttpStatus.CONFLICT;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
 }
