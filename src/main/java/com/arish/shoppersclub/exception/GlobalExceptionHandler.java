@@ -75,4 +75,34 @@ public class GlobalExceptionHandler {
                .status(status)
                .body(errorResponse);
     }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCategoryNotFoundException(CategoryNotFoundException exception , HttpServletRequest request){
+        HttpStatus status = HttpStatus.CONFLICT;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
+
+    @ExceptionHandler(CategoryAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleCategoryAlreadyExistsException(CategoryAlreadyExistsException exception , HttpServletRequest request){
+        HttpStatus status = HttpStatus.CONFLICT;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
 }
