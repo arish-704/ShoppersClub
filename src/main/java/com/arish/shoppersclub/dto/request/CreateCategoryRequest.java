@@ -1,6 +1,5 @@
 package com.arish.shoppersclub.dto.request;
 
-import com.arish.shoppersclub.entity.Category;
 
 import jakarta.validation.constraints.NotBlank;
 
