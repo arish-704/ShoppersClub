@@ -150,4 +150,34 @@ public class GlobalExceptionHandler {
                .status(status)
                .body(errorResponse);
     }
+
+    @ExceptionHandler(ProductImageNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProductImageNotFoundException(ProductImageNotFoundException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
+
+    @ExceptionHandler(DuplicateProductImageException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateProductImageException(DuplicateProductImageException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
 }
