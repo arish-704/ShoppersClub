@@ -151,8 +151,8 @@ public class GlobalExceptionHandler {
                .body(errorResponse);
     }
 
-    @ExceptionHandler(ProductImageNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleProductImageNotFoundException(ProductImageNotFoundException exception, HttpServletRequest request) {
+    @ExceptionHandler(CartNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCartNotFoundException(CartNotFoundException exception, HttpServletRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;
         ErrorResponse errorResponse = new ErrorResponse(
             LocalDateTime.now(),
@@ -166,8 +166,68 @@ public class GlobalExceptionHandler {
                .body(errorResponse);
     }
 
-    @ExceptionHandler(DuplicateProductImageException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicateProductImageException(DuplicateProductImageException exception, HttpServletRequest request) {
+    @ExceptionHandler(CartItemNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCartItemNotFoundException(CartItemNotFoundException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientStockException(InsufficientStockException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
+
+    @ExceptionHandler(ProductUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleProductUnavailableException(ProductUnavailableException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
+
+    @ExceptionHandler(WishlistItemNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleWishlistItemNotFoundException(WishlistItemNotFoundException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
+
+    @ExceptionHandler(DuplicateWishlistItemException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateWishlistItemException(DuplicateWishlistItemException exception, HttpServletRequest request) {
         HttpStatus status = HttpStatus.CONFLICT;
         ErrorResponse errorResponse = new ErrorResponse(
             LocalDateTime.now(),
