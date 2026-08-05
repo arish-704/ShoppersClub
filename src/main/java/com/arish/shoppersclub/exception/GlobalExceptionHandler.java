@@ -240,4 +240,94 @@ public class GlobalExceptionHandler {
                .status(status)
                .body(errorResponse);
     }
+
+    @ExceptionHandler(EmptyCartException.class)
+    public ResponseEntity<ErrorResponse> handleEmptyCartException(EmptyCartException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleOrderNotFoundException(OrderNotFoundException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
+
+    @ExceptionHandler(OrderCancellationNotAllowedException.class)
+    public ResponseEntity<ErrorResponse> handleOrderCancellationNotAllowedException(OrderCancellationNotAllowedException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
+
+    @ExceptionHandler(ReviewNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReviewNotFoundException(ReviewNotFoundException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
+
+    @ExceptionHandler(DuplicateReviewException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateReviewException(DuplicateReviewException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
+
+    @ExceptionHandler(NotVerifiedBuyerException.class)
+    public ResponseEntity<ErrorResponse> handleNotVerifiedBuyerException(NotVerifiedBuyerException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
 }
