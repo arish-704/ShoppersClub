@@ -26,6 +26,9 @@ import com.arish.shoppersclub.service.ProductImageService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.web.multipart.MultipartFile;
+import com.arish.shoppersclub.service.ImageStorageService;
+
 @Service
 @RequiredArgsConstructor
 public class ProductImageServiceImpl implements ProductImageService {
@@ -35,24 +38,35 @@ public class ProductImageServiceImpl implements ProductImageService {
     private final SellerRepository sellerRepository;
     private final UserRepository userRepository;
     private final ProductImageMapper productImageMapper;
+    private final ImageStorageService imageStorageService;
 
+    /**
+     * Uploads a MultipartFile to Cloudinary, receives the hosted secure URL, and persists the ProductImage entity.
+     */
     @Override
-    public ProductImageResponse addImage(Long productId, CreateProductImageRequest request) {
+    public ProductImageResponse addImage(Long productId, MultipartFile file, boolean isPrimary) {
         Product product = getOwnedProduct(productId);
 
-        if (productImageRepository.existsByProductAndImageUrl(product, request.imageUrl())) {
-            throw new DuplicateProductImageException("Product image with URL '" + request.imageUrl() + "' already exists for this product");
+        String imageUrl = imageStorageService.uploadImage(file);
+
+        if (productImageRepository.existsByProductAndImageUrl(product, imageUrl)) {
+            throw new DuplicateProductImageException("Product image with URL '" + imageUrl + "' already exists for this product");
         }
 
-        ProductImage productImage = productImageMapper.toEntity(request);
-        productImage.setProduct(product);
+        ProductImage productImage = ProductImage.builder()
+                .imageUrl(imageUrl)
+                .isPrimary(false)
+                .displayOrder(1)
+                .product(product)
+                .build();
 
         boolean hasImages = productImageRepository.existsByProduct(product);
 
         if (!hasImages) {
             productImage.setPrimary(true);
-        } else if (request.isPrimary()) {
+        } else if (isPrimary) {
             unsetCurrentPrimary(product);
+            productImage.setPrimary(true);
         }
 
         ProductImage savedImage = productImageRepository.save(productImage);
@@ -86,6 +100,10 @@ public class ProductImageServiceImpl implements ProductImageService {
         return productImageMapper.toResponse(productImage);
     }
 
+    /**
+     * Deletes a product image both from Cloudinary storage and the database.
+     * Auto-promotes the next remaining image to primary if the deleted image was primary.
+     */
     @Override
     public void deleteImage(Long productId, Long imageId) {
         Product product = getOwnedProduct(productId);
@@ -94,9 +112,15 @@ public class ProductImageServiceImpl implements ProductImageService {
                 .orElseThrow(() -> new ProductImageNotFoundException("Product image not found with id: " + imageId));
 
         boolean wasPrimary = productImage.isPrimary();
+        String imageUrl = productImage.getImageUrl();
 
+        // 1. Delete image from Cloudinary storage
+        imageStorageService.deleteImage(imageUrl);
+
+        // 2. Delete entity from database
         productImageRepository.delete(productImage);
 
+        // 3. Auto-promote next remaining image to primary if needed
         if (wasPrimary) {
             List<ProductImage> remainingImages = productImageRepository.findByProductOrderByDisplayOrderAsc(product);
             if (!remainingImages.isEmpty()) {

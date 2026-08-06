@@ -37,62 +37,44 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        
-                final String authHeader = request.getHeader("Authorization");
 
-                if(authHeader == null || !authHeader.startsWith("Bearer ")){
-                    filterChain.doFilter(request, response);
-                    return;
-                }
+        final String authHeader = request.getHeader("Authorization");
 
-                
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            final String jwt = authHeader.substring(7);
+            String redisKey = "blacklist:token:" + jwt;
+
+            // Only attempt authentication if the token is NOT in Redis blacklist
+            if (!redisService.hasKey(redisKey)) {
                 try {
+                    final String username = jwtService.extractUsername(jwt);
 
-    final String jwt = authHeader.substring(7);
+                    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                        UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-    // Redis Token Blacklist Check: If token exists in Redis blacklist, reject request
-    String redisKey = "blacklist:token:" + jwt;
-    if (redisService.hasKey(redisKey)) {
-        filterChain.doFilter(request, response);
-        return;
-    }
+                        if (jwtService.isTokenValid(jwt, userDetails)) {
+                            UsernamePasswordAuthenticationToken authenticationToken =
+                                    new UsernamePasswordAuthenticationToken(
+                                            userDetails,
+                                            null,
+                                            userDetails.getAuthorities()
+                                    );
 
-    final String username = jwtService.extractUsername(jwt);
+                            authenticationToken.setDetails(
+                                    new WebAuthenticationDetailsSource().buildDetails(request)
+                            );
 
-    if (username != null
-            && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-        UserDetails userDetails =
-                customUserDetailsService.loadUserByUsername(username);
-
-        if (jwtService.isTokenValid(jwt, userDetails)) {
-
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-
-            authenticationToken.setDetails(
-                    new WebAuthenticationDetailsSource()
-                            .buildDetails(request)
-            );
-
-            SecurityContextHolder
-                    .getContext()
-                    .setAuthentication(authenticationToken);
-        }
-    }
-
-} catch (JwtException | IllegalArgumentException ex) {
-
-    SecurityContextHolder.clearContext();
-
-}
-
-filterChain.doFilter(request, response);
+                            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                        }
+                    }
+                } catch (JwtException | IllegalArgumentException ex) {
+                    SecurityContextHolder.clearContext();
+                }
             }
+        }
+
+        filterChain.doFilter(request, response);
+    }
 
     
 

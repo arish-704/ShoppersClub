@@ -24,6 +24,10 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
 @RestController
 @RequestMapping("/api/v1/products/{productId}/images")
 @RequiredArgsConstructor
@@ -32,13 +36,14 @@ public class ProductImageController {
 
     private final ProductImageService productImageService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<ProductImageResponse> addImage(
             @PathVariable Long productId,
-            @Valid @RequestBody CreateProductImageRequest request) {
+            @RequestParam("image") MultipartFile image,
+            @RequestParam(value = "isPrimary", defaultValue = "false") boolean isPrimary) {
 
-        ProductImageResponse response = productImageService.addImage(productId, request);
+        ProductImageResponse response = productImageService.addImage(productId, image, isPrimary);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

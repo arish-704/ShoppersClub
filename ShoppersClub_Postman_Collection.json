@@ -1,0 +1,629 @@
+{
+	"info": {
+		"_postman_id": "shoppersclub-api-collection-v2",
+		"name": "ShoppersClub API Collection (V2 with Redis & Cloudinary)",
+		"description": "Complete Postman collection for testing ShoppersClub backend API including Auth, Token Blacklisting, Cloudinary Image Uploads, Product & Category Caching, Orders, Reviews, and Admin Endpoints.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:6969",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication & Redis Rate-Limit/Logout",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@gmail.com\",\n  \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login User (Rate Limited - 5 req/min)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set(\"authToken\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john.doe@gmail.com\",\n  \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Logout (Redis Token Blacklist)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. User Profile & Addresses",
+			"item": [
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "users", "me"]
+						}
+					}
+				},
+				{
+					"name": "Add Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"John Doe\",\n  \"phoneNumber\": \"+1234567890\",\n  \"addressLine1\": \"123 Main Street\",\n  \"addressLine2\": \"Apt 4B\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"country\": \"USA\",\n  \"postalCode\": \"10001\",\n  \"addressType\": \"HOME\",\n  \"isDefault\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/addresses",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "addresses"]
+						}
+					}
+				},
+				{
+					"name": "Get Addresses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/addresses",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "addresses"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Seller Store Management",
+			"item": [
+				{
+					"name": "Register Seller Store (Grants ROLE_SELLER)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"storeName\": \"Tech Emporium Store\",\n  \"description\": \"Official Store for High Tech Gadgets\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/sellers",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "sellers"]
+						}
+					}
+				},
+				{
+					"name": "Get My Store Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/sellers/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "sellers", "me"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Categories & Redis Cache",
+			"item": [
+				{
+					"name": "Create Category (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Electronics\",\n  \"description\": \"Gadgets and Devices\",\n  \"parentCategoryId\": null\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/categories",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "categories"]
+						}
+					}
+				},
+				{
+					"name": "Get All Categories (Cached in Redis)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/categories",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "categories"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Products & Redis Cache",
+			"item": [
+				{
+					"name": "Create Product (Seller)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Wireless Noise Cancelling Headphones\",\n  \"description\": \"Premium over-ear Bluetooth headphones with active noise cancellation\",\n  \"price\": 299.99,\n  \"stock\": 25,\n  \"categoryId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "products"]
+						}
+					}
+				},
+				{
+					"name": "Get Product By ID (Cached in Redis)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/products/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "products", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get All Active Products (Paginated)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/products?pageNo=0&pageSize=10&sortBy=createdAt&sortDir=desc",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "products"],
+							"query": [
+								{"key": "pageNo", "value": "0"},
+								{"key": "pageSize", "value": "10"},
+								{"key": "sortBy", "value": "createdAt"},
+								{"key": "sortDir", "value": "desc"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Cloudinary Real Image Upload",
+			"item": [
+				{
+					"name": "Upload Product Image to Cloudinary (multipart/form-data)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "isPrimary",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/products/1/images",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "products", "1", "images"]
+						}
+					}
+				},
+				{
+					"name": "Get Product Images",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/products/1/images",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "products", "1", "images"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Shopping Cart",
+			"item": [
+				{
+					"name": "Add Item to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"productId\": 1,\n  \"quantity\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/cart/items",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "cart", "items"]
+						}
+					}
+				},
+				{
+					"name": "Get Cart Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/cart",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "cart"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "8. Wishlist",
+			"item": [
+				{
+					"name": "Add to Wishlist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"productId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/wishlist",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "wishlist"]
+						}
+					}
+				},
+				{
+					"name": "Get My Wishlist (Paginated)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/wishlist",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "wishlist"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "9. Orders & Checkout",
+			"item": [
+				{
+					"name": "Checkout Cart & Place Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"addressId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "orders"]
+						}
+					}
+				},
+				{
+					"name": "Get My Orders (Paginated)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "orders"]
+						}
+					}
+				},
+				{
+					"name": "Cancel Order (Restores Stock)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/orders/1/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "orders", "1", "cancel"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "10. Product Reviews",
+			"item": [
+				{
+					"name": "Write Review (Verified Buyer)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"rating\": 5,\n  \"comment\": \"Outstanding sound quality and super comfortable!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/products/1/reviews",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "products", "1", "reviews"]
+						}
+					}
+				},
+				{
+					"name": "Get Product Reviews Summary",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/products/1/reviews/summary",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "products", "1", "reviews", "summary"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "11. Admin Operations",
+			"item": [
+				{
+					"name": "Verify Seller Store (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"verified\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/admin/sellers/1/verify",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "admin", "sellers", "1", "verify"]
+						}
+					}
+				},
+				{
+					"name": "Update Order Status (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"orderStatus\": \"DELIVERED\",\n  \"paymentStatus\": \"COMPLETED\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/admin/orders/1/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "admin", "orders", "1", "status"]
+						}
+					}
+				},
+				{
+					"name": "Get Platform Analytics Overview (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/admin/analytics/overview",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "admin", "analytics", "overview"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
