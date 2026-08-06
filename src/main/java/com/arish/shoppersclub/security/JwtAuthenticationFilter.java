@@ -16,14 +16,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+import com.arish.shoppersclub.service.RedisService;
+
 /**
  * Spring Security filter responsible for authenticating incoming
  * HTTP requests using a JSON Web Token (JWT).
  *
  * The filter extracts the JWT from the Authorization header,
- * validates it, and stores the authenticated user in the
- * SecurityContext so that downstream components know who
- * is making the request.
+ * checks Redis to ensure the token has not been blacklisted (logged out),
+ * validates it, and stores the authenticated user in the SecurityContext.
  */
 @Component
 @RequiredArgsConstructor
@@ -31,22 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
     private final JwtService jwtService;
     private final CustomUserDetailsService customUserDetailsService;
+    private final RedisService redisService;
 
-
-    /**
-     * Authenticates an incoming HTTP request using the JWT present
-     * in the Authorization header.
-     *
-     * If a valid Bearer token is found, the authenticated user is
-     * stored in the Spring Security context before the request
-     * continues through the remaining filter chain.
-     *
-     * @param request incoming HTTP request
-     * @param response outgoing HTTP response
-     * @param filterChain remaining filters in the security chain
-     * @throws ServletException if the request cannot be processed
-     * @throws IOException if an input or output error occurs
-     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -62,6 +49,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
                 try {
 
     final String jwt = authHeader.substring(7);
+
+    // Redis Token Blacklist Check: If token exists in Redis blacklist, reject request
+    String redisKey = "blacklist:token:" + jwt;
+    if (redisService.hasKey(redisKey)) {
+        filterChain.doFilter(request, response);
+        return;
+    }
+
     final String username = jwtService.extractUsername(jwt);
 
     if (username != null

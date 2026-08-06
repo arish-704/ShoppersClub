@@ -109,8 +109,27 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    private Date extractExpiration(String token) {
+    /**
+     * Extracts the expiration timestamp from the token.
+     *
+     * @param token JWT received from the client
+     * @return Date object representing token expiration time
+     */
+    public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
+    }
+
+    /**
+     * Calculates the remaining lifespan of a JWT in milliseconds.
+     * Used when blacklisting tokens in Redis to set the TTL equal to the remaining valid duration.
+     *
+     * @param token JWT received from client
+     * @return remaining valid lifespan in milliseconds (0 if already expired)
+     */
+    public long getRemainingExpirationMillis(String token) {
+        Date expiration = extractExpiration(token);
+        long remaining = expiration.getTime() - System.currentTimeMillis();
+        return Math.max(remaining, 0);
     }
 
     private boolean isTokenExpired(String token) {

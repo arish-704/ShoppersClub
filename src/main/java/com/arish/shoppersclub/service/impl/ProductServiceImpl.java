@@ -96,14 +96,24 @@ public class ProductServiceImpl implements ProductService {
         return mapToPagedResponse(productPage);
     }
 
+    /**
+     * Fetches product details by ID.
+     * Cached in Redis with key "products::<id>" for high-performance repeat reads.
+     */
     @Override
+    @org.springframework.cache.annotation.Cacheable(value = "products", key = "#id")
     public ProductResponse getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + id));
         return productMapper.toResponse(product);
     }
 
+    /**
+     * Updates an existing product.
+     * Automatically evicts (flushes) the stale product entry from Redis cache.
+     */
     @Override
+    @org.springframework.cache.annotation.CacheEvict(value = "products", key = "#id")
     public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
         Seller seller = getAuthenticatedSeller();
 
@@ -134,7 +144,12 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.toResponse(savedProduct);
     }
 
+    /**
+     * Soft-deletes a product (sets status to INACTIVE).
+     * Evicts the deleted product entry from Redis cache so stale data is not served.
+     */
     @Override
+    @org.springframework.cache.annotation.CacheEvict(value = "products", key = "#id")
     public void deleteProduct(Long id) {
         Seller seller = getAuthenticatedSeller();
         Product product = productRepository.findByIdAndSeller(id, seller)

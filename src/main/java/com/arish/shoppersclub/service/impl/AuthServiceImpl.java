@@ -23,6 +23,9 @@ import com.arish.shoppersclub.service.AuthService;
 import lombok.RequiredArgsConstructor;
 
 
+import java.util.concurrent.TimeUnit;
+import com.arish.shoppersclub.service.RedisService;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService{
@@ -32,6 +35,7 @@ public class AuthServiceImpl implements AuthService{
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final RedisService redisService;
 
 
     @Override
@@ -74,5 +78,26 @@ public class AuthServiceImpl implements AuthService{
        final String token = jwtService.generateToken(userDetails);
        return new AuthenticationResponse(token);
 
+    }
+
+    /**
+     * Logs out the user by blacklisting their active JWT in Redis.
+     *
+     * Key Format in Redis: "blacklist:token:<jwt_string>"
+     * Time-To-Live (TTL): Equal to the remaining valid milliseconds of the JWT.
+     * When the TTL expires, Redis automatically cleans up the key.
+     *
+     * @param bearerToken Raw Authorization header value (e.g. "Bearer eyJhbG...")
+     */
+    @Override
+    public void logout(String bearerToken) {
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            String token = bearerToken.substring(7);
+            long remainingMillis = jwtService.getRemainingExpirationMillis(token);
+            if (remainingMillis > 0) {
+                String redisKey = "blacklist:token:" + token;
+                redisService.setWithTTL(redisKey, "logout", remainingMillis, TimeUnit.MILLISECONDS);
+            }
+        }
     }
 }

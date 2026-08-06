@@ -16,6 +16,9 @@ import com.arish.shoppersclub.service.CategoryService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
@@ -23,7 +26,12 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
+    /**
+     * Creates a new category.
+     * Clears all category caches in Redis so new categories appear immediately.
+     */
     @Override
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryResponse createCategory(CreateCategoryRequest request) {
         if (categoryRepository.existsByName(request.name())) {
             throw new CategoryAlreadyExistsException("Category with name '" + request.name() + "' already exists");
@@ -41,7 +49,12 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.toResponse(savedCategory);
     }
 
+    /**
+     * Retrieves the entire active category tree.
+     * Cached in Redis with key "categories::all" to avoid DB queries on high-traffic homepage loads.
+     */
     @Override
+    @Cacheable(value = "categories", key = "'all'")
     public List<CategoryResponse> getAllCategories() {
         List<Category> categories = categoryRepository.findByActiveTrue();
         return categories.stream()
@@ -56,7 +69,12 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.toResponse(category);
     }
 
+    /**
+     * Updates an existing category.
+     * Flushes category caches in Redis.
+     */
     @Override
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryResponse updateCategory(Long id, UpdateCategoryRequest request) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + id));
@@ -82,7 +100,12 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.toResponse(savedCategory);
     }
 
+    /**
+     * Soft-deletes a category.
+     * Flushes category caches in Redis.
+     */
     @Override
+    @CacheEvict(value = "categories", allEntries = true)
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + id));
