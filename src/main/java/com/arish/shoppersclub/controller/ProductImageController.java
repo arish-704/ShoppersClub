@@ -22,6 +22,8 @@ import com.arish.shoppersclub.service.ProductImageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api/v1/products/{productId}/images")
 @RequiredArgsConstructor
@@ -31,6 +33,7 @@ public class ProductImageController {
     private final ProductImageService productImageService;
 
     @PostMapping
+    @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<ProductImageResponse> addImage(
             @PathVariable Long productId,
             @Valid @RequestBody CreateProductImageRequest request) {
@@ -52,6 +55,7 @@ public class ProductImageController {
     }
 
     @PutMapping("/{imageId}/primary")
+    @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<ProductImageResponse> setPrimaryImage(
             @PathVariable Long productId,
             @PathVariable Long imageId) {
@@ -63,6 +67,7 @@ public class ProductImageController {
 
     @DeleteMapping("/{imageId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('SELLER')")
     public void deleteImage(
             @PathVariable Long productId,
             @PathVariable Long imageId) {

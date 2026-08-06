@@ -41,6 +41,8 @@ import lombok.RequiredArgsConstructor;
  * - sortDir (default = "desc"): Newest items first.
  * ============================================================================
  */
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
@@ -50,6 +52,7 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
+    @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<ProductResponse> createProduct(
             @Valid @RequestBody CreateProductRequest request) {
 
@@ -73,6 +76,7 @@ public class ProductController {
     }
 
     @GetMapping("/me")
+    @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<PagedResponse<ProductResponse>> getMyProducts(
             @RequestParam(defaultValue = "0", required = false) int pageNo,
             @RequestParam(defaultValue = "10", required = false) int pageSize,
@@ -93,6 +97,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable Long id,
             @Valid @RequestBody UpdateProductRequest request) {
@@ -104,6 +109,7 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('SELLER')")
     public void deleteProduct(@PathVariable Long id) {
 
         productService.deleteProduct(id);

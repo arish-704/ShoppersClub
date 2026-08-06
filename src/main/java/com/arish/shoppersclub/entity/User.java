@@ -80,8 +80,9 @@ public class User extends BaseEntity implements UserDetails {
     @Builder.Default // --> Adding @Builder.Default makes builder-created users receive a real empty HashSet.
     private Set<Role> roles = new HashSet<>();
 
+    @Builder.Default
     @Column(nullable = false)
-    private Boolean active =true;
+    private Boolean active = true;
 
 
     /**

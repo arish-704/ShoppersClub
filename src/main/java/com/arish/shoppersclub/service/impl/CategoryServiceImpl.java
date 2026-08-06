@@ -68,6 +68,9 @@ public class CategoryServiceImpl implements CategoryService {
         categoryMapper.updateEntity(category, request);
 
         if (request.parentCategoryId() != null) {
+            if (id.equals(request.parentCategoryId())) {
+                throw new IllegalArgumentException("A category cannot be its own parent");
+            }
             Category parentCategory = categoryRepository.findById(request.parentCategoryId())
                     .orElseThrow(() -> new CategoryNotFoundException("Parent category not found with id: " + request.parentCategoryId()));
             category.setParentCategory(parentCategory);

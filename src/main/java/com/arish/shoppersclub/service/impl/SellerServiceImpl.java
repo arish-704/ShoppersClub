@@ -9,6 +9,7 @@ import com.arish.shoppersclub.dto.request.UpdateSellerRequest;
 import com.arish.shoppersclub.dto.response.SellerResponse;
 import com.arish.shoppersclub.entity.Seller;
 import com.arish.shoppersclub.entity.User;
+import com.arish.shoppersclub.enums.Role;
 import com.arish.shoppersclub.exception.SellerAlreadyExistsException;
 import com.arish.shoppersclub.exception.SellerNotFoundException;
 import com.arish.shoppersclub.exception.StoreNameAlreadyExistsException;
@@ -45,6 +46,10 @@ public class SellerServiceImpl implements SellerService {
         Seller seller = sellerMapper.toEntity(request);
         seller.setUser(user);
         seller.setVerified(false);
+
+        user.getRoles().add(Role.SELLER);
+        userRepository.save(user);
+
         Seller savedSeller = sellerRepository.save(seller);
         return sellerMapper.toResponse(savedSeller);          
     }
@@ -88,6 +93,10 @@ public class SellerServiceImpl implements SellerService {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         Seller seller = sellerRepository.findByUser(user)
                                         .orElseThrow(() -> new SellerNotFoundException("Seller profile not found."));
+
+        user.getRoles().remove(Role.SELLER);
+        userRepository.save(user);
+
         sellerRepository.delete(seller);
     }
 

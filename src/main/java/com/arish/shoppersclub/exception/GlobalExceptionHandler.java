@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(SellerNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleSellerNotFoundException(SellerNotFoundException exception , HttpServletRequest request){
-        HttpStatus status = HttpStatus.CONFLICT;
+        HttpStatus status = HttpStatus.NOT_FOUND;
         ErrorResponse errorResponse = new ErrorResponse(
             LocalDateTime.now(),
             status.value(),
@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleCategoryNotFoundException(CategoryNotFoundException exception , HttpServletRequest request){
-        HttpStatus status = HttpStatus.CONFLICT;
+        HttpStatus status = HttpStatus.NOT_FOUND;
         ErrorResponse errorResponse = new ErrorResponse(
             LocalDateTime.now(),
             status.value(),
@@ -324,6 +324,45 @@ public class GlobalExceptionHandler {
             status.value(),
             status.getReasonPhrase(),
             exception.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+            org.springframework.web.bind.MethodArgumentNotValidException exception,
+            HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String errorMessage = exception.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                .reduce((m1, m2) -> m1 + "; " + m2)
+                .orElse("Validation failed");
+
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            errorMessage,
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
+
+    @ExceptionHandler(org.springframework.orm.ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorResponse> handleOptimisticLockingFailureException(
+            org.springframework.orm.ObjectOptimisticLockingFailureException exception,
+            HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            "Data was modified concurrently by another transaction. Please retry.",
             request.getRequestURI()
         );
         return ResponseEntity
