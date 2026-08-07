@@ -437,4 +437,21 @@ public class GlobalExceptionHandler {
                .status(status)
                .body(errorResponse);
     }
+
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(
+            org.springframework.security.core.AuthenticationException exception,
+            HttpServletRequest request) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            "Invalid email or password",
+            request.getRequestURI()
+        );
+        return ResponseEntity
+               .status(status)
+               .body(errorResponse);
+    }
 }

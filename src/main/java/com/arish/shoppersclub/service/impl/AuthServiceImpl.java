@@ -26,6 +26,8 @@ import lombok.RequiredArgsConstructor;
 import java.util.concurrent.TimeUnit;
 import com.arish.shoppersclub.service.RedisService;
 
+import com.arish.shoppersclub.service.EmailService;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService{
@@ -36,6 +38,7 @@ public class AuthServiceImpl implements AuthService{
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final RedisService redisService;
+    private final EmailService emailService;
 
 
     @Override
@@ -76,6 +79,10 @@ public class AuthServiceImpl implements AuthService{
        final Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
        final String token = jwtService.generateToken(userDetails);
+
+       // Send login notification email to user
+       emailService.sendLoginNotification(request.email());
+
        return new AuthenticationResponse(token);
 
     }
