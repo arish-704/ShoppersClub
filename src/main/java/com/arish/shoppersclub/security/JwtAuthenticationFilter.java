@@ -28,7 +28,7 @@ import com.arish.shoppersclub.service.RedisService;
  */
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter{
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService customUserDetailsService;
@@ -38,9 +38,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        final String requestURI = request.getRequestURI();
+
+        // Bypass JWT authentication filter completely for public authentication endpoints
+        if (requestURI.startsWith("/api/v1/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        if (authHeader != null && authHeader.startsWith("Bearer ") && !authHeader.endsWith("null") && !authHeader.endsWith("undefined")) {
             final String jwt = authHeader.substring(7);
             String redisKey = "blacklist:token:" + jwt;
 
@@ -75,7 +83,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
         filterChain.doFilter(request, response);
     }
-
-    
-
 }
