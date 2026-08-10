@@ -43,6 +43,8 @@ import com.arish.shoppersclub.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import com.arish.shoppersclub.service.EmailService;
+
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -55,6 +57,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final OrderMapper orderMapper;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -136,6 +139,14 @@ public class OrderServiceImpl implements OrderService {
         savedOrder = orderRepository.save(savedOrder);
 
         cartItemRepository.deleteByCart(cart);
+
+        // Send order placement confirmation email
+        emailService.sendOrderPlacedNotification(
+            user.getEmail(),
+            savedOrder.getId(),
+            savedOrder.getTotalAmount(),
+            savedOrder.getTotalItems()
+        );
 
         return buildOrderResponse(savedOrder);
     }

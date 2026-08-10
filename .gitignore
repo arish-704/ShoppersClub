@@ -35,3 +35,13 @@ build/
 
 # Local application configuration may contain secrets.
 src/main/resources/application.yaml
+src/main/resources/application-prod.yaml
+src/main/resources/application-prod.yml
+src/main/resources/application-*.yaml
+src/main/resources/application-*.yml
+
+# Antigravity & Gemini assistant files
+.gemini/
+.antigravity/
+.brain/
+*.log

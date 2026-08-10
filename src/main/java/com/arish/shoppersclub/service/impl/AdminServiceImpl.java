@@ -37,6 +37,9 @@ import com.arish.shoppersclub.service.AdminService;
 
 import lombok.RequiredArgsConstructor;
 
+import com.arish.shoppersclub.enums.OrderStatus;
+import com.arish.shoppersclub.service.EmailService;
+
 @Service
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
@@ -50,6 +53,7 @@ public class AdminServiceImpl implements AdminService {
     private final OrderMapper orderMapper;
     private final ProductMapper productMapper;
     private final com.arish.shoppersclub.mapper.UserMapper userMapper;
+    private final EmailService emailService;
 
     @Override
     public SellerResponse verifySeller(Long sellerId, UpdateSellerVerificationRequest request) {
@@ -66,12 +70,22 @@ public class AdminServiceImpl implements AdminService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
 
+        OrderStatus previousStatus = order.getOrderStatus();
         order.setOrderStatus(request.orderStatus());
         if (request.paymentStatus() != null) {
             order.setPaymentStatus(request.paymentStatus());
         }
 
         Order updatedOrder = orderRepository.save(order);
+
+        // Send order shipped email notification when status changes to SHIPPED
+        if (request.orderStatus() == OrderStatus.SHIPPED && previousStatus != OrderStatus.SHIPPED) {
+            emailService.sendOrderShippedNotification(
+                order.getUser().getEmail(),
+                order.getId()
+            );
+        }
+
         return buildOrderResponse(updatedOrder);
     }
 

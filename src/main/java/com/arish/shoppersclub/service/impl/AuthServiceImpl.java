@@ -80,8 +80,8 @@ public class AuthServiceImpl implements AuthService{
        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
        final String token = jwtService.generateToken(userDetails);
 
-       // Send login notification email to user (TEMPORARILY COMMENTED OUT AS REQUESTED)
-       // emailService.sendLoginNotification(request.email());
+       // Send login notification email to user
+       emailService.sendLoginNotification(request.email());
 
        return new AuthenticationResponse(token);
 
