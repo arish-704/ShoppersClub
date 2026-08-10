@@ -25,8 +25,8 @@ spring:
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:furyoflegends7777@gmail.com}
-    password: ${MAIL_PASSWORD:ywwx cjox jkan sltx}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
@@ -57,10 +57,10 @@ server:
   port: ${PORT:6969}
 
 jwt:
-  secret-key: ${JWT_SECRET:tGidsnsfdpSeDmwGRMuiofYCzAW0ATUfJutzAvf16rh}
+  secret-key: ${JWT_SECRET:default-local-dev-jwt-secret-key-must-be-32-chars-long}
   expiration: ${JWT_EXPIRATION:86400000}
 
 cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME:skdh8snu}
-  api-key: ${CLOUDINARY_API_KEY:818351254924111}
-  api-secret: ${CLOUDINARY_API_SECRET:4XMztyd0Thu_m_MJxzXsfbrBc2Q}
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+  api-key: ${CLOUDINARY_API_KEY:}
+  api-secret: ${CLOUDINARY_API_SECRET:}
