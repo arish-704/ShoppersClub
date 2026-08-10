@@ -41,6 +41,7 @@ spring:
       enabled: false
 
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
     show-sql: true
