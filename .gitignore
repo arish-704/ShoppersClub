@@ -33,8 +33,7 @@ build/
 ### VS Code ###
 .vscode/
 
-# Local application configuration may contain secrets.
-src/main/resources/application.yaml
+# Production configuration secrets (ignored)
 src/main/resources/application-prod.yaml
 src/main/resources/application-prod.yml
 src/main/resources/application-*.yaml
