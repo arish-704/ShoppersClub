@@ -55,7 +55,7 @@ spring:
       max-request-size: 10MB
 
 server:
-  port: ${PORT:6969}
+  port: ${PORT:10000}
 
 jwt:
   secret-key: ${JWT_SECRET:default-local-dev-jwt-secret-key-must-be-32-chars-long}
