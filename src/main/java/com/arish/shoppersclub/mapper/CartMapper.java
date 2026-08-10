@@ -10,9 +10,16 @@ import com.arish.shoppersclub.dto.response.CartResponse;
 import com.arish.shoppersclub.entity.Cart;
 import com.arish.shoppersclub.entity.CartItem;
 import com.arish.shoppersclub.entity.Product;
+import com.arish.shoppersclub.entity.ProductImage;
+import com.arish.shoppersclub.repository.ProductImageRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class CartMapper {
+
+    private final ProductImageRepository productImageRepository;
 
     public CartItemResponse toCartItemResponse(CartItem cartItem) {
         Product product = cartItem.getProduct();
@@ -22,10 +29,21 @@ public class CartMapper {
         Long productId = product != null ? product.getId() : null;
         String productName = product != null ? product.getName() : "Unknown Product";
 
+        String productImageUrl = null;
+        if (product != null) {
+            productImageUrl = productImageRepository.findByProductAndIsPrimaryTrue(product)
+                    .map(ProductImage::getImageUrl)
+                    .orElseGet(() -> productImageRepository.findByProduct(product).stream()
+                            .findFirst()
+                            .map(ProductImage::getImageUrl)
+                            .orElse(null));
+        }
+
         return new CartItemResponse(
                 cartItem.getId(),
                 productId,
                 productName,
+                productImageUrl,
                 unitPrice,
                 cartItem.getQuantity(),
                 subtotal

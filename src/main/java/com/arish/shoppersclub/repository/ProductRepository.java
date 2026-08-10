@@ -39,4 +39,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findByStatus(ProductStatus status, Pageable pageable);
 
+    @org.springframework.data.jpa.repository.Query("SELECT p FROM Product p WHERE p.status = :status AND (LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.description) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<Product> searchActiveProducts(
+            @org.springframework.data.repository.query.Param("status") ProductStatus status,
+            @org.springframework.data.repository.query.Param("search") String search,
+            Pageable pageable
+    );
 }

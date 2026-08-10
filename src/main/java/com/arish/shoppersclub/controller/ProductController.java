@@ -65,12 +65,13 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<PagedResponse<ProductResponse>> getAllActiveProducts(
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0", required = false) int pageNo,
             @RequestParam(defaultValue = "10", required = false) int pageSize,
             @RequestParam(defaultValue = "createdAt", required = false) String sortBy,
             @RequestParam(defaultValue = "desc", required = false) String sortDir) {
 
-        PagedResponse<ProductResponse> response = productService.getAllActiveProducts(pageNo, pageSize, sortBy, sortDir);
+        PagedResponse<ProductResponse> response = productService.getAllActiveProducts(search, pageNo, pageSize, sortBy, sortDir);
 
         return ResponseEntity.ok(response);
     }

@@ -78,6 +78,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public CartResponse getMyCart() {
         Cart cart = getOrCreateCartForAuthenticatedUser();
         return buildCartResponse(cart);

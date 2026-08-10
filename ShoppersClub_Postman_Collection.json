@@ -622,6 +622,28 @@
 							"path": ["api", "v1", "admin", "analytics", "overview"]
 						}
 					}
+				},
+				{
+					"name": "Get All Sellers (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/admin/sellers?verified=false&pageNo=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "admin", "sellers"],
+							"query": [
+								{"key": "verified", "value": "false"},
+								{"key": "pageNo", "value": "0"},
+								{"key": "pageSize", "value": "10"}
+							]
+						}
+					}
 				}
 			]
 		}

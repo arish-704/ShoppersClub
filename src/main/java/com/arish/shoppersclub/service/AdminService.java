@@ -21,6 +21,10 @@ public interface AdminService {
 
     PagedResponse<OrderResponse> getAllOrders(int pageNo, int pageSize, String sortBy, String sortDir);
 
+    PagedResponse<SellerResponse> getAllSellers(Boolean verified, int pageNo, int pageSize, String sortBy, String sortDir);
+
+    PagedResponse<com.arish.shoppersclub.dto.response.UserProfileResponse> getAllUsers(int pageNo, int pageSize, String sortBy, String sortDir);
+
     AdminPlatformOverviewResponse getPlatformOverview();
 
 }

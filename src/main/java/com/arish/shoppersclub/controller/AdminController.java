@@ -88,6 +88,31 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/sellers")
+    public ResponseEntity<PagedResponse<SellerResponse>> getAllSellers(
+            @RequestParam(required = false) Boolean verified,
+            @RequestParam(defaultValue = "0", required = false) int pageNo,
+            @RequestParam(defaultValue = "10", required = false) int pageSize,
+            @RequestParam(defaultValue = "createdAt", required = false) String sortBy,
+            @RequestParam(defaultValue = "desc", required = false) String sortDir) {
+
+        PagedResponse<SellerResponse> response = adminService.getAllSellers(verified, pageNo, pageSize, sortBy, sortDir);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<PagedResponse<com.arish.shoppersclub.dto.response.UserProfileResponse>> getAllUsers(
+            @RequestParam(defaultValue = "0", required = false) int pageNo,
+            @RequestParam(defaultValue = "10", required = false) int pageSize,
+            @RequestParam(defaultValue = "createdAt", required = false) String sortBy,
+            @RequestParam(defaultValue = "desc", required = false) String sortDir) {
+
+        PagedResponse<com.arish.shoppersclub.dto.response.UserProfileResponse> response = adminService.getAllUsers(pageNo, pageSize, sortBy, sortDir);
+
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/analytics/overview")
     public ResponseEntity<AdminPlatformOverviewResponse> getPlatformOverview() {
 

@@ -10,6 +10,7 @@ public record WishlistItemResponse(
     Long productId,
     String productName,
     BigDecimal productPrice,
+    String productImageUrl,
     ProductStatus productStatus,
     LocalDateTime createdAt
 ) {

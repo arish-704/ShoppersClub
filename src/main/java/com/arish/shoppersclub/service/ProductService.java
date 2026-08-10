@@ -21,6 +21,6 @@ public interface ProductService {
 
     PagedResponse<ProductResponse> getProductsBySeller(Long sellerId, int pageNo, int pageSize, String sortBy, String sortDir);
 
-    PagedResponse<ProductResponse> getAllActiveProducts(int pageNo, int pageSize, String sortBy, String sortDir);
+    PagedResponse<ProductResponse> getAllActiveProducts(String search, int pageNo, int pageSize, String sortBy, String sortDir);
 
 }

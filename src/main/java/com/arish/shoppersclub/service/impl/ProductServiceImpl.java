@@ -178,9 +178,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PagedResponse<ProductResponse> getAllActiveProducts(int pageNo, int pageSize, String sortBy, String sortDir) {
+    public PagedResponse<ProductResponse> getAllActiveProducts(String search, int pageNo, int pageSize, String sortBy, String sortDir) {
         Pageable pageable = createPageable(pageNo, pageSize, sortBy, sortDir);
-        Page<Product> productPage = productRepository.findByStatus(ProductStatus.ACTIVE, pageable);
+        Page<Product> productPage = (search != null && !search.trim().isEmpty())
+                ? productRepository.searchActiveProducts(ProductStatus.ACTIVE, search.trim(), pageable)
+                : productRepository.findByStatus(ProductStatus.ACTIVE, pageable);
         return mapToPagedResponse(productPage);
     }
 

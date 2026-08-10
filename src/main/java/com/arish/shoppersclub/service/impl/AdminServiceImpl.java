@@ -49,6 +49,7 @@ public class AdminServiceImpl implements AdminService {
     private final SellerMapper sellerMapper;
     private final OrderMapper orderMapper;
     private final ProductMapper productMapper;
+    private final com.arish.shoppersclub.mapper.UserMapper userMapper;
 
     @Override
     public SellerResponse verifySeller(Long sellerId, UpdateSellerVerificationRequest request) {
@@ -119,6 +120,50 @@ public class AdminServiceImpl implements AdminService {
                 orderPage.getTotalElements(),
                 orderPage.getTotalPages(),
                 orderPage.isLast()
+        );
+    }
+
+    /**
+     * Retrieves a paginated list of all seller stores.
+     * Optionally filters by verification status (verified=true / verified=false).
+     */
+    @Override
+    public PagedResponse<SellerResponse> getAllSellers(Boolean verified, int pageNo, int pageSize, String sortBy, String sortDir) {
+        Pageable pageable = createPageable(pageNo, pageSize, sortBy, sortDir);
+        Page<Seller> sellerPage = (verified != null)
+                ? sellerRepository.findByVerified(verified, pageable)
+                : sellerRepository.findAll(pageable);
+
+        List<SellerResponse> content = sellerPage.getContent().stream()
+                .map(sellerMapper::toResponse)
+                .toList();
+
+        return new PagedResponse<>(
+                content,
+                sellerPage.getNumber(),
+                sellerPage.getSize(),
+                sellerPage.getTotalElements(),
+                sellerPage.getTotalPages(),
+                sellerPage.isLast()
+        );
+    }
+
+    @Override
+    public PagedResponse<com.arish.shoppersclub.dto.response.UserProfileResponse> getAllUsers(int pageNo, int pageSize, String sortBy, String sortDir) {
+        Pageable pageable = createPageable(pageNo, pageSize, sortBy, sortDir);
+        Page<com.arish.shoppersclub.entity.User> userPage = userRepository.findAll(pageable);
+
+        List<com.arish.shoppersclub.dto.response.UserProfileResponse> content = userPage.getContent().stream()
+                .map(userMapper::toProfileResponse)
+                .toList();
+
+        return new PagedResponse<>(
+                content,
+                userPage.getNumber(),
+                userPage.getSize(),
+                userPage.getTotalElements(),
+                userPage.getTotalPages(),
+                userPage.isLast()
         );
     }
 
