@@ -5,7 +5,7 @@
 ![MySQL](https://img.shields.io/badge/MySQL-8.4-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-Upstash_TLS-DC382D?style=for-the-badge&logo=redis&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Production_Container-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+
 
 > **ShoppersClub Backend** is an enterprise-grade, high-throughput RESTful e-commerce API engine designed for seamless multi-vendor marketplaces. Powered by **Spring Boot 3.5**, **Java 21**, **Aiven Cloud MySQL**, **Upstash Serverless Redis**, **Cloudinary CDN**, and **Spring Security 6**.
 
@@ -156,6 +156,5 @@ docker run -p 10000:10000 --env-file .env shoppersclub-backend
 
 ## 🛡️ License
 
-Distributed under the **MIT License**. See `LICENSE` for details.
 
 Developed with ❤️ by **Arish Shahid**.
